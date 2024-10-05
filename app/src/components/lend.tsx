@@ -1,5 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import LendModal from './modals/lend'
+import ConnectModal from './modals/connect'
+
+import { FHELend, RPC, UNDERLYING_NAME, COLLATERAL_NAME, UNDERLYING_SYMBOL, COLLATERAL_SYMBOL, UNDERLYING_ADDRESS, COLLATERAL_ADDRESS, YIELD_SHARE_ADDRESS } from '../utils/const'
+import FHELend_ABI from '../utils/ABI.json'
+
+import { ethers } from 'ethers'
+import { useAccount } from 'wagmi'
 
 const Lend = () => {
 
@@ -7,12 +14,34 @@ const Lend = () => {
     const [isLendModalOpen, setLendModalOpen] = useState(false)
     const handleLendModal = () => { setLendModalOpen(prevState => !prevState) }
 
+    const ConnectModalRef = useRef<HTMLDivElement>(null)
+    const [isConnectModalOpen, setConnectModalOpen] = useState(false)
+    const handleConnectModal = () => { setConnectModalOpen(prevState => !prevState) }
+
+    const d = { name: UNDERLYING_NAME, symbol: UNDERLYING_SYMBOL, address: UNDERLYING_ADDRESS, decimals: 18 }
+    const c = { name: COLLATERAL_NAME, symbol: COLLATERAL_SYMBOL, address: COLLATERAL_ADDRESS, decimals: 18 }
+
+    const provider = new ethers.JsonRpcProvider(RPC)
+    const FHELend_contract = new ethers.Contract(FHELend, FHELend_ABI, provider)
+
     const [loadingAPY, setLoadingAPY] = useState(false)
+    const [APY, setAPY] = useState(0)
 
-    // const [posId, setPosId] = useState(null)
+    async function getLendingAPY() {
+        const apy = await FHELend_contract.getLendingAPY()
+        console.log(Number(ethers.formatEther(apy)) * 100);
+        setAPY(Number(ethers.formatEther(apy)) * 100)
+        setLoadingAPY(false)
+    }
 
-    const d = { name: 'testDeposit', symbol: 'DEP', address: '0x', decimals: 18 }
-    const c = { name: 'testCollateral', symbol: 'COL', address: '0x', decimals: 18 }
+    useEffect(() => {
+        if (APY === 0) {
+            setLoadingAPY(true)
+            getLendingAPY()
+        }
+    }, [APY])
+
+    const { isConnected } = useAccount()
 
     return (
         <>
@@ -32,22 +61,29 @@ const Lend = () => {
                         {loadingAPY ? <>
                             <div className='flex justify-center mx-auto h-5 w-20 animate-loader bg-bg' />
                         </> : <>
-                            <span className='flex justify-center mx-auto text-green'>12%</span>
+                            <span className='flex justify-center mx-auto text-green'>{APY}%</span>
                         </>}
                     </div>
                 </td>
                 <td className="w-1/4">
                     <div className="h-12 bg-black rounded-sm">
                         <div className='h-full w-full p-1.5'>
-                            <button onClick={() => handleLendModal()} className='w-full h-full flex justify-center items-center bg-w text-bg rounded-sm font-[500] uppercase'>
-                                Lend
-                            </button>
+                            {isConnected ? <>
+                                <button onClick={() => handleLendModal()} className='w-full h-full flex justify-center items-center bg-w text-bg rounded-sm font-[500] uppercase'>
+                                    Lend
+                                </button>
+                            </> : <>
+                                <button onClick={() => handleConnectModal()} className='w-full h-full flex justify-center items-center bg-w text-bg rounded-sm font-[500] uppercase'>
+                                    Lend
+                                </button>
+                            </>}
                         </div>
                     </div>
                 </td>
             </tr>
             <>
-                {isLendModalOpen && <><LendModal deposit={d} collateral={c} showModal={isLendModalOpen} closeModal={handleLendModal} ref={LendModalRef} /></>}
+                {isLendModalOpen && <><LendModal deposit={d} apy={APY} showModal={isLendModalOpen} closeModal={handleLendModal} ref={LendModalRef} /></>}
+                {isConnectModalOpen && <><ConnectModal showModal={isConnectModalOpen} closeModal={handleConnectModal} ref={ConnectModalRef} /></>}
             </>
         </>
     )

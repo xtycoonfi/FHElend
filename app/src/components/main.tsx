@@ -8,6 +8,7 @@ const Main = () => {
     const [display, setDisplay] = useState(0)
     const [loading, setLoading] = useState(true)
 
+
     useEffect(() => {
         if (display == 0) {
             setLoading(true)
