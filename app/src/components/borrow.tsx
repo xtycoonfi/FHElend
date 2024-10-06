@@ -48,12 +48,12 @@ const Borrow = () => {
             <tr className="w-full font-mono">
                 <td className="w-1/4">
                     <div className="h-12 bg-black rounded-sm items-center flex">
-                        <span className='flex justify-center mx-auto'>WETH</span>
+                        <span className='flex justify-center mx-auto'>FUSD</span>
                     </div>
                 </td>
                 <td className="w-1/4">
                     <div className="h-12 bg-black rounded-sm items-center flex">
-                        <span className='flex justify-center mx-auto'>FUSD</span>
+                        <span className='flex justify-center mx-auto'>WETH</span>
                     </div>
                 </td>
                 <td className="w-1/4">
