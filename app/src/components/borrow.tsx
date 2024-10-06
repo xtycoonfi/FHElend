@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import BorrowModal from './modals/borrow'
 import ConnectModal from './modals/connect'
 
-import { FHELend, RPC, UNDERLYING_NAME, COLLATERAL_NAME, UNDERLYING_SYMBOL, COLLATERAL_SYMBOL, UNDERLYING_ADDRESS, COLLATERAL_ADDRESS, DEBT_SHARE_ADDRESS } from '../utils/const'
+import { FHELend, RPC, UNDERLYING_NAME, COLLATERAL_NAME, UNDERLYING_SYMBOL, COLLATERAL_SYMBOL, UNDERLYING_ADDRESS, COLLATERAL_ADDRESS } from '../utils/const'
 import FHELend_ABI from '../utils/ABI.json'
 
 import { ethers } from 'ethers'
@@ -19,8 +19,6 @@ const Borrow = () => {
     const ConnectModalRef = useRef<HTMLDivElement>(null)
     const [isConnectModalOpen, setConnectModalOpen] = useState(false)
     const handleConnectModal = () => { setConnectModalOpen(prevState => !prevState) }
-
-    //const [posId, setPosId] = useState(null)
 
     const d = { name: UNDERLYING_NAME, symbol: UNDERLYING_SYMBOL, address: UNDERLYING_ADDRESS, decimals: 18 }
     const c = { name: COLLATERAL_NAME, symbol: COLLATERAL_SYMBOL, address: COLLATERAL_ADDRESS, decimals: 18 }
@@ -63,7 +61,7 @@ const Borrow = () => {
                         {loadingAPY ? <>
                             <div className='flex justify-center mx-auto h-5 w-20 animate-loader bg-bg' />
                         </> : <>
-                            <span className='flex justify-center mx-auto text-red'>{APY}%</span>
+                            <span className='flex justify-center mx-auto text-red'>{APY.toFixed(2)}%</span>
                         </>}
                     </div>
                 </td>

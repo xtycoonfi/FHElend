@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from 'react'
 import LendModal from './modals/lend'
 import ConnectModal from './modals/connect'
 
-import { FHELend, RPC, UNDERLYING_NAME, COLLATERAL_NAME, UNDERLYING_SYMBOL, COLLATERAL_SYMBOL, UNDERLYING_ADDRESS, COLLATERAL_ADDRESS, YIELD_SHARE_ADDRESS } from '../utils/const'
+import { FHELend, RPC, UNDERLYING_NAME, UNDERLYING_SYMBOL, UNDERLYING_ADDRESS } from '../utils/const'
 import FHELend_ABI from '../utils/ABI.json'
 
-import { ethers } from 'ethers'
 import { useAccount } from 'wagmi'
+import { ethers } from 'ethers'
 
 const Lend = () => {
 
@@ -19,7 +19,6 @@ const Lend = () => {
     const handleConnectModal = () => { setConnectModalOpen(prevState => !prevState) }
 
     const d = { name: UNDERLYING_NAME, symbol: UNDERLYING_SYMBOL, address: UNDERLYING_ADDRESS, decimals: 18 }
-    const c = { name: COLLATERAL_NAME, symbol: COLLATERAL_SYMBOL, address: COLLATERAL_ADDRESS, decimals: 18 }
 
     const provider = new ethers.JsonRpcProvider(RPC)
     const FHELend_contract = new ethers.Contract(FHELend, FHELend_ABI, provider)
@@ -61,7 +60,7 @@ const Lend = () => {
                         {loadingAPY ? <>
                             <div className='flex justify-center mx-auto h-5 w-20 animate-loader bg-bg' />
                         </> : <>
-                            <span className='flex justify-center mx-auto text-green'>{APY}%</span>
+                            <span className='flex justify-center mx-auto text-green'>{APY.toFixed(2)}%</span>
                         </>}
                     </div>
                 </td>

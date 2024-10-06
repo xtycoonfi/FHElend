@@ -8,7 +8,6 @@ const Main = () => {
     const [display, setDisplay] = useState(0)
     const [loading, setLoading] = useState(true)
 
-
     useEffect(() => {
         if (display == 0) {
             setLoading(true)
@@ -48,7 +47,7 @@ const Main = () => {
                     <table className="w-full @[500px]:![--image-size:60px] @[500px]:![--container-padding:.8rem]">
                         <thead className="border-[0.75px] border-ba">
                             <tr className='text-xs font-mono font-normal'>
-                                <th className='border-[0.75px] border-ba py-0.5'>Deposit</th>
+                                <th className='border-[0.75px] border-ba py-0.5'>Borrow</th>
                                 <th className='border-[0.75px] border-ba py-0.5'>Collateral</th>
                                 <th className='border-[0.75px] border-ba py-0.5'>APY</th>
                                 <th className='border-[0.75px] border-ba py-0.5'>IN/OUT</th>

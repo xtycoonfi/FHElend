@@ -11,6 +11,15 @@ const fhenixHelium: Chain = {
     blockExplorers: { default: { name: 'Fhenix Helium Explorer', url: 'https://explorer.testnet.fhenix.zone' } },
 }
 
+// const fhenixLocal: Chain = {
+//     testnet: true,
+//     id: 412346,
+//     name: 'Fhenix Local',
+//     nativeCurrency: { name: 'FHE', symbol: 'FHE', decimals: 18 },
+//     rpcUrls: { default: { http: ['http://127.0.0.1:42069'] } },
+//     blockExplorers: { default: { name: 'Fhenix Helium Explorer', url: 'https://explorer.testnet.fhenix.zone' } },
+// }
+
 export const config = createConfig({
     chains: [fhenixHelium],
     connectors: [
