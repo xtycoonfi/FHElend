@@ -2,6 +2,7 @@
 
 pragma solidity >=0.8.19 <=0.8.25;
 
+import { FHE, euint32, ebool } from "@fhenixprotocol/contracts/FHE.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./lend_share_ERC20.sol";
@@ -27,12 +28,13 @@ contract FHElend is Initializable {
 
     mapping(address => position) public positions;
     address[] public users;
+    address public owner;
 
     uint256 public constant PRECISION = 1e18;
     uint256 public LAST_UPDATE;
 
-    uint256 public baseAPY = 2e16; // 2% => ASK IF GOOD
-    uint256 public slopeRate = 2e17; // 20% => ASK IF GOOD
+    euint32 internal encrypted_base_APY;
+    euint32 internal encrypted_slope_rate;
 
     uint256 public constant UTILIZATION_OPTIMAL = 8e17; // 80% 
     uint256 public constant UTILIZATION_MAX = 95e16; // 95%
@@ -53,6 +55,27 @@ contract FHElend is Initializable {
         collateral = IERC20(_collateral);
         rate = PRECISION;
         LAST_UPDATE = block.timestamp;
+    }
+
+    function initializeEncryptedRates(bytes calldata encryptedBaseAPY_, bytes calldata encryptedSlopeRate_) public {
+        encrypted_base_APY = FHE.asEuint32(encryptedBaseAPY_);
+        encrypted_slope_rate = FHE.asEuint32(encryptedSlopeRate_);
+    }
+
+    ////////////////// FHE APY CALCULATION ////////////////////////
+
+    function calculateInterestRate() public view returns (uint256) {
+        euint32 utilization = FHE.asEuint32(calculateUtilizationRate() / 1e16);
+        euint32 encryptedOptimal = FHE.asEuint32(UTILIZATION_OPTIMAL / 1e16);
+        euint32 encryptedMax = FHE.asEuint32(UTILIZATION_MAX / 1e16);
+        euint32 encryptedRate;
+        ebool isLessThanOptimal = FHE.lte(utilization, encryptedOptimal);
+        euint32 rate1 = FHE.add(encrypted_base_APY, FHE.div(FHE.mul(utilization, encrypted_slope_rate), encryptedOptimal));
+        euint32 excessUtilization = FHE.sub(utilization, encryptedOptimal);
+        euint32 slope2 = FHE.div(FHE.mul(encrypted_slope_rate, encryptedMax), FHE.sub(encryptedMax, encryptedOptimal));
+        euint32 rate2 = FHE.add(FHE.add(encrypted_base_APY, encrypted_slope_rate), FHE.div(FHE.mul(excessUtilization, slope2), FHE.sub(encryptedMax, encryptedOptimal)));
+        encryptedRate = FHE.select(isLessThanOptimal, rate1, rate2);
+        return uint256(FHE.decrypt(encryptedRate)) * 1e16;
     }
 
     /////////////////////// LENDING /////////////////////////////
@@ -195,16 +218,6 @@ contract FHElend is Initializable {
             }
         }
         LAST_UPDATE = block.timestamp;
-    }
-
-    function calculateInterestRate() public view returns (uint256) {
-        uint256 utilization = calculateUtilizationRate();
-        if (utilization <= UTILIZATION_OPTIMAL) return baseAPY + (utilization * slopeRate) / UTILIZATION_OPTIMAL;
-        else {
-            uint256 excessUtilization = utilization - UTILIZATION_OPTIMAL;
-            uint256 slope2 = (slopeRate * UTILIZATION_MAX) / (UTILIZATION_MAX - UTILIZATION_OPTIMAL);
-            return baseAPY + slopeRate + (excessUtilization * slope2) / (UTILIZATION_MAX - UTILIZATION_OPTIMAL);
-        }
     }
 
     function calculateUtilizationRate() public view returns (uint256) {

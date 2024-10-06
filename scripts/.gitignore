@@ -1,2 +1,4 @@
 /node_modules
 package-mock.json
+.env
+.DS_Store

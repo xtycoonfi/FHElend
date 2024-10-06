@@ -4,8 +4,8 @@ pragma solidity >=0.8.19 <=0.8.25;
 
 contract fake_oracle {
 
-    address public lendERC20 = 0xbc48636ab88C078908F507fF8EE511923A0d73DB; // USD
-    address public debtERC20 = 0xc775Bf6F4d6D4F83B6b86Be7DFD6e3b4bDb7C3eC; // WETH
+    address public lendERC20 = 0xb68De1A5C21576d316C105609d1C3916fB080Ff3; // FUSD
+    address public debtERC20 = 0xF6e801cB6080c4a07BbACD33dbE359e9fB2b6668; // WETH
 
     uint256 public lendERC20_price = 1 * 1e18;
     uint256 public debtERC20_price = 2500 * 1e18;

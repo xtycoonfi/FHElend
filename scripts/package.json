@@ -2,10 +2,10 @@
   "name": "scripts",
   "version": "1.0.0",
   "scripts": {
-    "genInitSupply": "ts-node src/genInitSupply.ts"
+    "FHE_setRates": "ts-node src/fhe/initRates.ts"
   },
   "dependencies": {
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.5",
     "ethers": "^6.13.0",
     "fhenixjs": "0.3.0"
   },
